@@ -11,8 +11,13 @@ export default function SignInScreen({ navigation }) {
 
   const handleSignIn = async () => {
     try {
-      const data = await apiSignIn(email, password); // this returns { token, userId, email }
-      await signIn(data); // pass whole user object to context
+      const data = await apiSignIn(email, password); // data = { token, user: { id, email } }
+
+      await signIn({
+        token: data.token,
+        userId: data.user.id,
+        email: data.user.email
+      });
     } catch (err) {
       setError(err.message);
     }
@@ -54,12 +59,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
+    backgroundColor: '#3D3D3D',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 30,
+    color: '#FAFAFA', // Set the title color to white
   },
   input: {
     height: 40,
@@ -68,6 +75,8 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     paddingHorizontal: 10,
     borderRadius: 5,
+    backgroundColor: '#FAFAFA', // Make input box background white
+    color: '#333', // Text color inside the textbox
   },
   error: {
     color: 'red',
@@ -75,7 +84,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   link: {
-    color: 'blue',
+    color: '#02C8FF', // Set link text color to the same blue as the button
     textAlign: 'center',
     marginTop: 20,
   },
