@@ -5,33 +5,37 @@ import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 
 export default function StatusDropdownButton({
-  initialStatus = 'Add to TBR',
-  onChange,
-  workID,
-  authToken,
-  onStatusChange,
+  initialStatus = 'Add to TBR',     // Default label if no status passed
+  onChange,                          // Optional callback when status changes locally
+  workID,                            // Book work ID for backend request
+  authToken,                         // Auth token from context
+  onStatusChange,                    // Optional callback to refresh parent state
 }) {
-  const [menuVisible, setMenuVisible] = useState(false);
-  const [statusLabel, setStatusLabel] = useState(initialStatus);
+  const [menuVisible, setMenuVisible] = useState(false);       // Tracks menu open/close state
+  const [statusLabel, setStatusLabel] = useState(initialStatus); // Display label on button
 
   const openMenu = () => setMenuVisible(true);
   const closeMenu = () => setMenuVisible(false);
 
+  // Handle selecting a status option from the menu
   const handleMenuSelection = async (label) => {
-    setStatusLabel(label);
+    setStatusLabel(label); // Update button text
     closeMenu();
     if (onChange) onChange(label);
 
     try {
+      // POST status change to backend
       const response = await axios.post(
         'http://192.168.0.20:3001/userBooks/addBook',
         { workID, status: label },
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
       console.log('Book added:', response.data);
+
+      // Trigger optional callback to update UI in parent component
       if (onStatusChange) {
-        onStatusChange(); //Refresh parent list
-}
+        onStatusChange();
+      }
     } catch (err) {
       console.error('Failed to add book:', err);
       Alert.alert('Error', 'Could not update book status.');
@@ -40,12 +44,18 @@ export default function StatusDropdownButton({
 
   return (
     <View style={styles.statusButtonWrapper}>
+      {/* Main button showing current status */}
       <TouchableOpacity style={styles.statusButton}>
-        <Text style={styles.statusButtonLabel} numberOfLines={1} ellipsizeMode="tail">
+        <Text
+          style={styles.statusButtonLabel}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
           {statusLabel}
         </Text>
       </TouchableOpacity>
 
+      {/* Dropdown chevron and menu */}
       <Menu
         visible={menuVisible}
         onDismiss={closeMenu}
@@ -64,9 +74,11 @@ export default function StatusDropdownButton({
   );
 }
 
+// Constants for sizing
 const BUTTON_HEIGHT = 40;
 const STATUS_BUTTON_WIDTH = 140;
 
+// Styles
 const styles = StyleSheet.create({
   statusButtonWrapper: {
     flexDirection: 'row',

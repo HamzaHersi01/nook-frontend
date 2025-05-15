@@ -15,6 +15,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
+// Define navigation route parameters for BookDetails
 type RootStackParamList = {
   BookDetails: {
     title: string;
@@ -28,14 +29,17 @@ type RootStackParamList = {
 };
 
 export default function ScanISBNScreen() {
-  const [permission, requestPermission] = useCameraPermissions();
-  const [facing, setFacing] = useState<'back' | 'front'>('back');
-  const [scanned, setScanned] = useState(false);
-  const lastScannedData = useRef<string | null>(null);
+  const [permission, requestPermission] = useCameraPermissions(); // Camera permission state
+  const [facing, setFacing] = useState<'back' | 'front'>('back'); // Camera orientation
+  const [scanned, setScanned] = useState(false); // Tracks if a barcode has been scanned
+  const lastScannedData = useRef<string | null>(null); // Prevents duplicate processing
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
+  // If permission object is not ready, return early
   if (!permission) return <View />;
+
+  // Prompt for camera permission
   if (!permission.granted) {
     return (
       <View style={styles.container}>
@@ -47,24 +51,27 @@ export default function ScanISBNScreen() {
     );
   }
 
+  // Handle barcode scan event
   const handleBarcodeScanned = async ({ data, type }: BarcodeScanningResult) => {
     console.log('Scanned barcode:', data, 'Type:', type);
     lastScannedData.current = data;
-    if (scanned) return;
 
-    const isbn = data.replace(/[^0-9X]/g, '');
+    if (scanned) return; // Ignore if already scanned
+
+    const isbn = data.replace(/[^0-9X]/g, ''); // Sanitize to valid ISBN characters
     if (!/^\d{10}$|^\d{13}$/.test(isbn)) {
       Alert.alert('Invalid Barcode', 'This is not a valid ISBN.');
       return;
     }
 
     try {
-      setScanned(true);
+      setScanned(true); // Prevent multiple scans
       const response = await fetch(`http://192.168.0.20:3001/search/isbn/${isbn}`);
       if (!response.ok) throw new Error('Book not found');
 
       const book = await response.json();
 
+      // Navigate to book details screen with fetched data
       navigation.navigate('BookDetails', {
         title: book.title,
         bookAuthor: book.bookAuthor,
@@ -88,11 +95,13 @@ export default function ScanISBNScreen() {
         facing={facing}
         onBarcodeScanned={handleBarcodeScanned}
         barcodeScannerSettings={{
-          barcodeTypes: ['ean13', 'ean8', 'upc_a', 'upc_e'],
+          barcodeTypes: ['ean13', 'ean8', 'upc_a', 'upc_e'], // Common ISBN formats
         }}
       >
+        {/* Visual guide box overlay */}
         <View style={styles.overlayBox} />
 
+        {/* Show "Scan Again" button only after successful scan */}
         <View style={styles.buttonContainer}>
           {scanned && (
             <TouchableOpacity
@@ -113,6 +122,7 @@ export default function ScanISBNScreen() {
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,

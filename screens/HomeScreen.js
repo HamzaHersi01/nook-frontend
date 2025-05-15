@@ -15,11 +15,12 @@ import { AuthContext } from '../context/AuthContext';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 export default function HomeScreen() {
-  const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const { userData } = useContext(AuthContext);
-  const navigation = useNavigation();
+  const [books, setBooks] = useState([]); // All user's books
+  const [loading, setLoading] = useState(true); // Loading state
+  const { userData } = useContext(AuthContext); // Auth context for token
+  const navigation = useNavigation(); // Navigation hook
 
+  // Fetch books from backend when screen is focused
   useFocusEffect(
   React.useCallback(() => {
     const fetchBooks = async () => {
@@ -41,9 +42,11 @@ export default function HomeScreen() {
   }, [userData])
 );
 
+  // Categorize books by status
   const currentlyReading = books.filter((book) => book.status === 'reading');
   const toBeRead = books.filter((book) => book.status === 'to-read');
 
+  // Renders each book item in horizontal lists
   const renderBook = ({ item }) => (
     <TouchableOpacity
       style={styles.bookCard}

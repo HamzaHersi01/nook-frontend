@@ -13,10 +13,11 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { searchBooksByQuery } from '../api/searchService';
 
 export default function SearchBar() {
-  const [searchText, setSearchText] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchText, setSearchText] = useState(''); // User input for search
+  const [searchResults, setSearchResults] = useState([]); // Top 3 search previews
   const navigation = useNavigation();
 
+  // Clear search input and results when screen regains focus
   useFocusEffect(
     React.useCallback(() => {
       setSearchText('');
@@ -24,6 +25,7 @@ export default function SearchBar() {
     }, [])
   );
 
+  // Fetch search results when user types (with debounce)
   useEffect(() => {
     const fetchResults = async () => {
       if (searchText.trim() === '') {
@@ -39,15 +41,17 @@ export default function SearchBar() {
       }
     };
 
-    const timeout = setTimeout(fetchResults, 300); // debounce
+    const timeout = setTimeout(fetchResults, 300); // Debounce to reduce API calls
     return () => clearTimeout(timeout);
   }, [searchText]);
 
+  // Clear search input and preview results
   const handleClear = () => {
     setSearchText('');
     setSearchResults([]);
   };
 
+  // Navigate to full results screen
   const handleSubmit = () => {
     if (searchText.trim() && searchResults.length > 0) {
       navigation.navigate('Search', {
@@ -59,6 +63,7 @@ export default function SearchBar() {
     }
   };
 
+  // Render individual book result preview
   const renderBookItem = ({ item }) => {
     const handlePress = () => {
       navigation.navigate('BookDetails', {
@@ -93,6 +98,7 @@ export default function SearchBar() {
 
   return (
     <View style={styles.wrapper}>
+      {/* Search Input and Icons */}
       <View style={styles.container}>
         <TextInput
           style={styles.input}
@@ -102,21 +108,25 @@ export default function SearchBar() {
           placeholderTextColor="#888"
           onSubmitEditing={handleSubmit}
         />
+        {/* Navigate to Scan ISBN screen */}
         <TouchableOpacity
           onPress={() => navigation.navigate('ScanISBN')}
           style={styles.iconContainer}
         >
           <Ionicons name="scan-circle-outline" size={30} color="#007bff" />
         </TouchableOpacity>
+
+        {/* Clear input button */}
         <TouchableOpacity onPress={handleClear} style={styles.clearIconContainer}>
           <Ionicons name="close-circle-outline" size={25} color="#888" />
         </TouchableOpacity>
       </View>
 
+      {/* Preview Search Results */}
       {searchResults.length > 0 && searchText.trim() !== '' && (
         <View style={styles.resultsContainer}>
           <FlatList
-            data={searchResults.slice(0, 3)}
+            data={searchResults.slice(0, 3)} // Only show top 3 results
             keyExtractor={(item, index) => item.workID + index}
             renderItem={renderBookItem}
           />
@@ -129,6 +139,7 @@ export default function SearchBar() {
   );
 }
 
+// Styling for layout and components
 const styles = StyleSheet.create({
   wrapper: {
     marginHorizontal: 20,

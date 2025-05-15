@@ -6,8 +6,9 @@ import { AuthContext } from '../context/AuthContext';
 
 export default function BookCard({ item }) {
   const navigation = useNavigation();
-  const { userData } = useContext(AuthContext);
+  const { userData } = useContext(AuthContext); // Access user token for status updates
 
+  // Navigate to the BookDetails screen when card is pressed
   const handleCardPress = () => {
     navigation.navigate('BookDetails', {
       workID: item.workID.replace('/works/', ''),
@@ -20,7 +21,10 @@ export default function BookCard({ item }) {
 
   return (
     <TouchableOpacity style={styles.resultCard} onPress={handleCardPress}>
+      {/* Book Cover */}
       <Image source={{ uri: item.smallCoverURL }} style={styles.coverImage} />
+
+      {/* Book Info Section */}
       <View style={styles.bookInfo}>
         <Text style={styles.bookTitle}>{item.title}</Text>
         <Text style={styles.bookAuthor}>{item.author_name?.[0]}</Text>
@@ -28,6 +32,8 @@ export default function BookCard({ item }) {
           {item.first_publish_year ? `Published: ${item.first_publish_year}` : ''}
           {item.number_of_pages_median ? `  •  Pages: ${item.number_of_pages_median}` : ''}
         </Text>
+
+        {/* Status Dropdown Button */}
         <View style={styles.buttonContainer}>
           <View style={styles.buttonRow}>
             <StatusDropdownButton 
@@ -41,6 +47,7 @@ export default function BookCard({ item }) {
   );
 }
 
+// Styling for the book card layout
 const styles = StyleSheet.create({
   resultCard: {
     flexDirection: 'row',

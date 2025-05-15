@@ -13,6 +13,7 @@ import StatusDropdownButton from '../components/StatusDropdownButton';
 import { AuthContext } from '../context/AuthContext';
 
 export default function BookDetailsScreen({ route }) {
+  // Extract navigation parameters passed from previous screen
   const {
     title,
     workID,
@@ -21,11 +22,13 @@ export default function BookDetailsScreen({ route }) {
     bookAuthor,
   } = route.params;
 
-  const [bookData, setBookData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [showFullDescription, setShowFullDescription] = useState(false);
-  const { userData } = useContext(AuthContext);
+  const [bookData, setBookData] = useState(null); // Holds full book details
+  const [loading, setLoading] = useState(true); // Track loading state
+  const [showFullDescription, setShowFullDescription] = useState(false); // Toggle long descriptions
 
+  const { userData } = useContext(AuthContext); // Get user token from context
+
+  // Fetch detailed book info using workID
   useEffect(() => {
     const fetchBookDetails = async () => {
       try {
@@ -43,6 +46,7 @@ export default function BookDetailsScreen({ route }) {
     fetchBookDetails();
   }, [workID]);
 
+  // Show loading spinner while data is being fetched
   if (loading || !bookData) {
     return (
       <View style={[styles.container, styles.centered]}>
@@ -51,20 +55,25 @@ export default function BookDetailsScreen({ route }) {
     );
   }
 
+  // Toggle between truncated and full description
   const toggleDescription = () => {
     setShowFullDescription((prev) => !prev);
   };
 
+  // Show "Read more" only for long descriptions
   const shouldShowReadMore = bookData.description?.length > 300;
 
   return (
     <ScrollView style={styles.container}>
+      {/* Top section: cover image + meta info */}
       <View style={styles.topSection}>
         <Image source={{ uri: bookData.cover }} style={styles.coverImage} />
 
         <View style={styles.metaContainer}>
           <Text style={styles.title}>{bookData.title || title}</Text>
+
           {bookAuthor && <Text style={styles.metaText}>Author: {bookAuthor}</Text>}
+
           <Text style={styles.metaText}>
             {number_of_pages_median
               ? `Pages: ${number_of_pages_median}`
@@ -75,7 +84,7 @@ export default function BookDetailsScreen({ route }) {
               : 'Published: N/A'}
           </Text>
 
-          {/* Add StatusDropdownButton with props */}
+          {/* Status dropdown for changing reading state */}
           <View style={styles.statusButton}>
             <StatusDropdownButton
               workID={workID}
@@ -85,10 +94,13 @@ export default function BookDetailsScreen({ route }) {
         </View>
       </View>
 
+      {/* Divider */}
       <View style={styles.spacer} />
 
+      {/* Description section */}
       <View style={styles.descriptionSection}>
         <Text style={styles.label}>Description:</Text>
+
         <Text
           style={styles.description}
           numberOfLines={showFullDescription ? undefined : 10}
@@ -108,6 +120,7 @@ export default function BookDetailsScreen({ route }) {
   );
 }
 
+// Styles for layout and text
 const styles = StyleSheet.create({
   container: {
     flex: 1,

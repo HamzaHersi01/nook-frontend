@@ -1,30 +1,37 @@
 import React, { useState } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import SearchBar from '../components/SearchBar';
-import BookCard from '../components/BookCard'; // ✅ Import BookCard
-import { Provider as PaperProvider } from 'react-native-paper';
+import BookCard from '../components/BookCard'; // Reusable book display component
+import { Provider as PaperProvider } from 'react-native-paper'; // Provides theme support
 
 export default function BookSearchScreen({ route }) {
+  // Extract query and initial search results from route parameters
   const { query, results } = route.params;
+
+  // Track search input state locally
   const [searchText, setSearchText] = useState(query);
 
   return (
     <PaperProvider>
       <View style={styles.container}>
+        {/* Top search bar */}
         <SearchBar
           searchText={searchText}
           setSearchText={setSearchText}
         />
+
+        {/* Display search query and result count */}
         <Text style={styles.text}>Search Results for: {query}</Text>
         <Text style={styles.resultCount}>{results.length} result(s) found</Text>
 
+        {/* Show message or results list */}
         {results.length === 0 ? (
           <Text style={styles.text}>No results found.</Text>
         ) : (
           <FlatList
             data={results}
             keyExtractor={(item) => item.workID.toString()}
-            renderItem={({ item }) => <BookCard item={item} />}
+            renderItem={({ item }) => <BookCard item={item} />} // Reuse BookCard for layout
             contentContainerStyle={styles.resultsContainer}
           />
         )}
@@ -33,6 +40,7 @@ export default function BookSearchScreen({ route }) {
   );
 }
 
+// Screen styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,

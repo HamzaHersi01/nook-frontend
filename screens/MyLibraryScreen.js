@@ -13,14 +13,16 @@ import { AuthContext } from '../context/AuthContext';
 import StatusDropdownButton from '../components/StatusDropdownButton';
 import { useFocusEffect } from '@react-navigation/native';
 
+// Define available book status filters
 const FILTERS = ['to-read', 'reading', 'finished', 'paused', 'did not finish'];
 
 export default function MyLibraryScreen() {
-  const [selectedFilter, setSelectedFilter] = useState('to-read');
-  const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const { userData } = useContext(AuthContext);
+  const [selectedFilter, setSelectedFilter] = useState('to-read'); // Default filter
+  const [books, setBooks] = useState([]); // All books from backend
+  const [loading, setLoading] = useState(true); // Loading state
+  const { userData } = useContext(AuthContext); // Auth context for token access
 
+  // Fetch user's books from backend
   const fetchBooks = async () => {
     setLoading(true);
     try {
@@ -37,6 +39,7 @@ export default function MyLibraryScreen() {
     }
   };
 
+  // Refresh data when screen is focused
   useFocusEffect(
     React.useCallback(() => {
       if (userData?.token) {
@@ -45,8 +48,10 @@ export default function MyLibraryScreen() {
     }, [userData])
   );
 
+  // Filter books based on selected status
   const filteredBooks = books.filter((book) => book.status === selectedFilter);
 
+  // Render filter button for each status
   const renderFilter = (filter) => (
     <TouchableOpacity key={filter} onPress={() => setSelectedFilter(filter)}>
       <Text
@@ -60,19 +65,22 @@ export default function MyLibraryScreen() {
     </TouchableOpacity>
   );
 
+  // Render each book as a card with image and info
   const renderBook = ({ item }) => (
     <View style={styles.bookCard}>
       <Image source={{ uri: item.cover }} style={styles.coverImage} />
       <View style={styles.bookInfo}>
         <Text style={styles.bookTitle}>{item.title}</Text>
         <Text style={styles.metaText}>
-          {item.first_publish_year ? `Published: ${item.first_publish_year}` : 'Published: N/A'}
+          {item.first_publish_year
+            ? `Published: ${item.first_publish_year}`
+            : 'Published: N/A'}
         </Text>
         <StatusDropdownButton
           initialStatus={item.status}
           workID={item.workID}
           authToken={userData.token}
-          onStatusChange={fetchBooks}
+          onStatusChange={fetchBooks} // Refresh books when status changes
         />
       </View>
     </View>
@@ -80,8 +88,10 @@ export default function MyLibraryScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Top filter bar */}
       <View style={styles.filterBar}>{FILTERS.map(renderFilter)}</View>
 
+      {/* Loading, empty, or book list */}
       {loading ? (
         <ActivityIndicator size="large" color="#FFF" style={{ marginTop: 40 }} />
       ) : filteredBooks.length === 0 ? (
@@ -98,6 +108,7 @@ export default function MyLibraryScreen() {
   );
 }
 
+// Screen styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -1,17 +1,19 @@
 import React, { useContext } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import { AuthContext } from '../context/AuthContext';
-import { Ionicons } from '@expo/vector-icons';
+import { AuthContext } from '../context/AuthContext'; // Context for user info and logout
+import { Ionicons } from '@expo/vector-icons'; // Icon library
 
 export default function ProfileScreen() {
-  const { userData, signOut } = useContext(AuthContext);
+  const { userData, signOut } = useContext(AuthContext); // Access current user and logout method
 
+  // Return nothing if user is not logged in (extra safety)
   if (!userData) {
-    return null; // Prevents error from accessing token on null
+    return null;
   }
 
+  // Handle user sign out
   const handleSignOut = () => {
-    signOut();
+    signOut(); // Clear user data from context and storage
   };
 
   return (
@@ -19,7 +21,7 @@ export default function ProfileScreen() {
       {/* Profile Icon */}
       <Ionicons name="person-circle-outline" size={100} color="#FAFAFA" style={styles.icon} />
 
-      {/* Email */}
+      {/* Display user's email */}
       <Text style={styles.email}>{userData.email}</Text>
 
       {/* Sign Out Button */}
@@ -30,6 +32,7 @@ export default function ProfileScreen() {
   );
 }
 
+// Styles for layout and appearance
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -1,23 +1,30 @@
 import { useState } from 'react';
 import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
-import { signUp } from '../api/authService';
+import { signUp } from '../api/authService'; // Import the signUp API function
 
 export default function SignUpScreen({ navigation }) {
+  // State variables for user input and error handling
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
+  // Function to handle sign-up logic
   const handleSignUp = async () => {
+    // Check if passwords match
     if (password !== confirmPassword) {
       setError("Passwords don't match");
       return;
     }
 
     try {
+      // Call the sign-up API
       await signUp(email, password);
+
+      // Navigate to SignIn screen after successful sign-up
       navigation.navigate('SignIn');
     } catch (err) {
+      // Set error message from the API response
       setError(err.message);
     }
   };
@@ -25,9 +32,11 @@ export default function SignUpScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Create Account</Text>
-      
+
+      {/* Display error message if there's an error */}
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      
+
+      {/* Email input */}
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -36,6 +45,8 @@ export default function SignUpScreen({ navigation }) {
         autoCapitalize="none"
         keyboardType="email-address"
       />
+
+      {/* Password input */}
       <TextInput
         style={styles.input}
         placeholder="Password"
@@ -43,6 +54,8 @@ export default function SignUpScreen({ navigation }) {
         onChangeText={setPassword}
         secureTextEntry
       />
+
+      {/* Confirm Password input */}
       <TextInput
         style={styles.input}
         placeholder="Confirm Password"
@@ -50,9 +63,11 @@ export default function SignUpScreen({ navigation }) {
         onChangeText={setConfirmPassword}
         secureTextEntry
       />
-      
+
+      {/* Sign Up button */}
       <Button title="Sign Up" onPress={handleSignUp} />
-      
+
+      {/* Link to navigate to Sign In screen */}
       <Text 
         style={styles.link}
         onPress={() => navigation.navigate('SignIn')}
@@ -63,6 +78,7 @@ export default function SignUpScreen({ navigation }) {
   );
 }
 
+// Style definitions
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -75,7 +91,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 30,
-    color: '#FAFAFA', // Set the title color to white
+    color: '#FAFAFA',
   },
   input: {
     height: 40,
@@ -84,8 +100,8 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     paddingHorizontal: 10,
     borderRadius: 5,
-    backgroundColor: '#FAFAFA', // Make input box background white
-    color: '#333', // Text color inside the textbox
+    backgroundColor: '#FAFAFA',
+    color: '#333',
   },
   error: {
     color: 'red',
@@ -93,7 +109,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   link: {
-    color: '#02C8FF', // Set link text color to the same blue as the button
+    color: '#02C8FF',
     textAlign: 'center',
     marginTop: 20,
   },
